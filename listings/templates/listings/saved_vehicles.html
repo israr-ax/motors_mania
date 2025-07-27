@@ -1,0 +1,74 @@
+{% extends 'listings/base.html' %}
+{% block title %}Saved Vehicles | Motors Mania{% endblock %}
+
+{% block content %}
+<style>
+    .vehicle-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+    }
+    .vehicle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    .vehicle-card img {
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .vehicle-card:hover img {
+        transform: scale(1.05);
+    }
+    .price-tag {
+        font-size: 1rem;
+        color: #28a745;
+        font-weight: 600;
+    }
+    .btn-chat {
+        background-color: #17a2b8;
+        color: #fff;
+        transition: background-color 0.2s ease;
+    }
+    .btn-chat:hover {
+        background-color: #138496;
+        color: #fff;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold">Your Saved Vehicles</h3>
+        <a href="{% url 'home' %}" class="btn btn-outline-primary btn-sm">Back to Home</a>
+    </div>
+    
+    {% if favorites %}
+        <div class="row">
+            {% for fav in favorites %}
+                <div class="col-md-4 mb-4">
+                    <div class="card vehicle-card h-100 shadow-sm">
+                        <div onclick="window.location.href='{% url 'vehicle_detail' fav.vehicle.pk %}'">
+                            {% if fav.vehicle.images.first %}
+                                <img src="{{ fav.vehicle.images.first.image.url }}" class="card-img-top" alt="{{ fav.vehicle.title }}">
+                            {% else %}
+                                <img src="/media/default-car.jpg" class="card-img-top" alt="{{ fav.vehicle.title }}">
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ fav.vehicle.title }}</h5>
+                            <p class="price-tag">PKR. {{ fav.vehicle.price }}</p>
+                            <a href="{% url 'vehicle_detail' fav.vehicle.pk %}" class="btn btn-sm btn-primary w-100 mb-2">View Details</a>
+                            <a href="{% url 'start_chat' fav.vehicle.pk %}" class="btn btn-sm btn-chat w-100">💬 Chat Seller</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center shadow-sm"> 
+            You haven't saved any vehicles yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

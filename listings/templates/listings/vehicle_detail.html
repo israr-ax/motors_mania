@@ -1,0 +1,63 @@
+{% extends 'listings/base.html' %}
+{% block title %}{{ vehicle.title }} | Motors Mania{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="row">
+    <!-- Vehicle Images Carousel -->
+    <div class="col-md-6">
+      {% if vehicle.images.all %}
+        <div id="vehicleCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for img in vehicle.images.all %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{{ img.image.url }}" class="d-block w-100" style="height: 400px; object-fit: cover;" alt="{{ vehicle.title }}">
+              </div>
+            {% endfor %}
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#vehicleCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#vehicleCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+      {% else %}
+        <img src="{{ vehicle.image.url }}" class="img-fluid" alt="{{ vehicle.title }}">
+      {% endif %}
+    </div>
+
+    <!-- Vehicle Details -->
+    <div class="col-md-6">
+      <h2>{{ vehicle.title }}</h2>
+      <p><strong>Status:</strong> 
+  {% if vehicle.status == "Available" %}
+      <span class="badge bg-success ">Available</span>
+  {% else %}
+      <span class="badge bg-danger ">Sold</span>
+  {% endif %}
+</p>
+
+      <p><strong>Price:</strong> <span class="text-success fw-bold">PKR. {{ vehicle.price }}</span></p>
+      <p><strong>Type:</strong> {{ vehicle.vehicle_type }}</p>
+      <p><strong>Category:</strong> {{ vehicle.category }}</p>
+      <p>{{ vehicle.description }}</p> 
+      <p><strong>Posted by:</strong> {{ vehicle.seller.username }}</p>
+      <a href="{% url 'start_chat' vehicle.seller.id %}" class="btn btn-primary mt-3">
+        <i class="fa fa-comments"></i> Message Seller
+      </a>
+
+      {% if request.user == vehicle.seller %}
+    <form method="post" action="{% url 'update_status' vehicle.id %}">
+        {% csrf_token %}
+        <button type="submit" name="status" value="Available" class="btn btn-success btn-sm " style="margin-top: 4px;">Mark as Available</button>
+        <button type="submit" name="status" value="Sold" class=" btn btn-danger btn-sm " style="margin-top: 4px;">Mark as Sold</button>
+    </form>
+{% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,221 @@
+{% extends 'listings/base.html' %}
+{% load static %}
+
+{% block title %}My Dashboard | Motors Mania{% endblock %}
+
+{% block content %}
+<style>
+  .stat-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  .stat-card:hover { transform: translateY(-5px); }
+
+  #Available { background: #96c896; }
+  #Available:hover { background: #73c473ff; }
+  #Sold { background: #e36969c2; }
+  #Sold:hover { background: #dc4444c2; }
+  #TVC{background: #7a6868c2;}
+  #TVC:hover { background: #382828c2; }
+
+
+  .vehicle-card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+  .vehicle-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+  .vehicle-card img {
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  .vehicle-card:hover img { transform: scale(1.05); }
+
+  .image-preview-container img {
+    width: 100px;
+    height: 80px;
+    object-fit: cover;
+    margin: 5px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+  }
+  .delete-btn {
+    position: relative;
+    top: -80px;
+    right: -70px;
+    background: rgba(255,0,0,0.7);
+    border: none;
+    color: white;
+    padding: 2px 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+
+<!-- Welcome Text -->
+<div class="mb-4 text-center">
+  <h2>Welcome back, {{ user.username|title }}!</h2>
+  <p class="text-muted">Manage your posted vehicles and track your sales.</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4 text-center">
+  <div class="col-md-4 mb-3">
+    <div class="stat-card" id="TVC">
+      <h3>{{ total_vehicles }}</h3>
+      <p>Total Vehicles</p>
+    </div>
+  </div>
+  <div class="col-md-4 mb-3">
+    <div class="stat-card" id="Available">
+      <h3>{{ available_count }}</h3>
+      <p>Available</p>
+    </div>
+  </div>
+  <div class="col-md-4 mb-3">
+    <div class="stat-card" id="Sold">
+      <h3>{{ sold_count }}</h3>
+      <p>Sold</p>
+    </div>
+  </div>
+</div>
+
+<!-- Add Vehicle Button -->
+<div class="text-end mb-3">
+  <a href="{% url 'post_vehicle' %}" class="btn btn-primary">+ Add New Vehicle</a>
+</div>
+
+<!-- Posted Vehicles -->
+<h4 class="mb-3">My Posted Vehicles</h4>
+<div class="row">
+  {% for vehicle in vehicles %}
+    <div class="col-md-4 mb-4">
+      <div class="card vehicle-card h-100 shadow-sm">
+        {% if vehicle.images.first %}
+          <a href="{% url 'vehicle_detail' vehicle.pk %}">
+            <img src="{{ vehicle.images.first.image.url }}" class="card-img-top vehicle-img" alt="{{ vehicle.title }}">
+          </a>
+        {% else %}
+          <a href="{% url 'vehicle_detail' vehicle.pk %}">
+            <div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999; font-weight: bold;">No Image</div>
+          </a>
+        {% endif %}
+
+        <div class="card-body">
+          <h5 class="card-title">{{ vehicle.title }}</h5>
+          <p><strong>Price:</strong> PKR. {{ vehicle.price }}</p>
+          <span class="badge bg-{{ vehicle.status|lower }}">{{ vehicle.status }}</span>
+        </div>
+
+        <div class="card-footer text-center vehicle-actions">
+          <button class="btn btn-outline-primary btn-sm edit-image-btn"
+                  data-id="{{ vehicle.id }}" data-bs-toggle="modal"
+                  data-bs-target="#editImageModal">
+            Edit Images
+          </button>
+          <button class="btn btn-warning btn-sm edit-btn"
+                  data-id="{{ vehicle.id }}"
+                  data-title="{{ vehicle.title }}"
+                  data-price="{{ vehicle.price }}"
+                  data-category="{{ vehicle.category }}"
+                  data-vehicle_type="{{ vehicle.vehicle_type }}"
+                  data-description="{{ vehicle.description }}"
+                  data-bs-toggle="modal" data-bs-target="#editVehicleModal">
+            Edit
+          </button>
+          <form method="post" action="{% url 'delete_vehicle' vehicle.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+          </form>
+          {% if vehicle.status == "Available" %}
+            <form method="post" action="{% url 'update_vehicle_status' vehicle.id %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="Sold">
+              <button type="submit" class="btn btn-warning btn-sm">Mark as Sold</button>
+            </form>
+          {% else %}
+            <form method="post" action="{% url 'update_vehicle_status' vehicle.id %}" style="display:inline;">
+              {% csrf_token %}
+              <input type="hidden" name="status" value="Available">
+              <button type="submit" class="btn btn-warning btn-sm">Mark as Available</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12 text-center">
+      <p class="text-muted">You haven't posted any vehicles yet.</p>
+    </div>
+  {% endfor %}
+</div>
+
+<!-- Edit Image Modal -->
+<div class="modal fade" id="editImageModal" tabindex="-1" aria-labelledby="editImageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Vehicle Images</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" enctype="multipart/form-data" id="editImageForm">
+          {% csrf_token %}
+          <input type="hidden" name="vehicle_id" id="editImageVehicleId">
+
+          <div class="mb-3">
+            <label class="form-label">Upload New Images</label>
+            <input type="file" name="new_images" class="form-control" accept="image/*" multiple>
+          </div>
+
+          <h6>Current Images</h6>
+          <div id="imagePreviewContainer" class="image-preview-container d-flex flex-wrap"></div>
+
+          <button type="submit" class="btn btn-primary w-100 mt-3">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.edit-image-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const vehicleId = this.dataset.id;
+    document.getElementById('editImageVehicleId').value = vehicleId;
+    document.getElementById('editImageForm').action = `/vehicle/${vehicleId}/images/`;
+
+    // Fetch existing images for this vehicle
+    fetch(`/vehicle/${vehicleId}/images/json/`)
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('imagePreviewContainer');
+        container.innerHTML = '';
+        data.images.forEach(img => {
+          const div = document.createElement('div');
+          div.style.position = 'relative';
+          div.innerHTML = `
+            <img src="${img.url}" alt="Vehicle Image">
+            <form method="post" action="/vehicle/image/${img.id}/delete/" onsubmit="return confirm('Delete this image?')">
+              <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+              <button type="submit" class="delete-btn">&times;</button>
+            </form>
+          `;
+          container.appendChild(div);
+        });
+      });
+  });
+});
+</script>
+
+{% endblock %}

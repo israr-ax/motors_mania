@@ -1,0 +1,154 @@
+{% extends 'listings/base.html' %}
+{% load static %}
+{% block title %}Chats | Motors Mania{% endblock %}
+{% block content %}
+<div class="container-fluid my-4">
+  <div class="row">
+    
+    <!-- Left Sidebar: Users -->
+    <div class="col-md-3 border-end bg-white shadow-sm p-0" style="color: black;">
+      <div class="p-3 border-bottom">
+        <h5 class="mb-0">Chats</h5>
+      </div>
+      <div class="list-group list-group-flush">
+        {% for u in users %}
+          <a href="{% url 'start_chat' u.id %}" 
+             class="list-group-item list-group-item-action d-flex align-items-center {% if u.id == other_user.id %}active{% endif %}">
+            
+            {% if u.profile.profile_image %}
+              <img src="{{ u.profile.profile_image.url }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+            {% else %}
+              <img src="{% static 'images/default-avatar.png' %}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+            {% endif %}
+            
+            <span>{{ u.username }}</span>
+          </a>
+        {% empty %}
+          <p class="text-muted p-3">No chats yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Right Chat Area -->
+    <div class="col-md-9 d-flex flex-column" style="height: 80vh;">
+      {% if other_user %}
+        <!-- Chat Header -->
+        <div class="d-flex align-items-center border-bottom p-3 bg-light">
+          {% if other_user.profile.profile_image %}
+            <img src="{{ other_user.profile.profile_image.url }}" class="rounded-circle me-2" style="width: 50px; height: 50px; object-fit: cover;">
+          {% else %}
+            <img src="{% static 'images/default-avatar.png' %}" class="rounded-circle me-2" style="width: 50px; height: 50px; object-fit: cover;">
+          {% endif %}
+          <h5 class="mb-0" style="color: black;">{{ other_user.username }}</h5>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chat-box" class="flex-grow-1 p-3 bg-light overflow-auto" style="color:black;">
+          {% for msg in messages %}
+            <div class="mb-3 {% if msg.sender == user %}text-end{% endif %}">
+              <div class="d-inline-block p-2 rounded shadow-sm 
+                          {% if msg.sender == user %}bg-primary text-white{% else %}bg-white border{% endif %}"
+                   style="max-width: 70%;">
+                <small class="d-block fw-bold">{{ msg.sender.username }}</small>
+                <p class="mb-1">{{ msg.content }}</p>
+
+                {% if msg.image %}
+                  <img src="{{ msg.image.url }}" class="img-thumbnail mt-1" style="max-width:150px;">
+                {% endif %}
+                {% if msg.video %}
+                  <video controls class="rounded shadow-sm mt-1" style="max-width:150px;">
+                    <source src="{{ msg.video.url }}" type="video/mp4">
+                  </video>
+                {% endif %}
+              </div>
+            </div>
+          {% empty %}
+            <p class="text-muted">No messages yet. Start a conversation!</p>
+          {% endfor %}
+        </div>
+
+        <!-- File Preview -->
+        <div id="preview" class="border-top bg-white p-2" style="display:none;">
+          <div class="d-flex align-items-center">
+            <img id="preview-img" class="img-thumbnail me-2" style="max-height:100px; display:none;">
+            <video id="preview-video" controls class="rounded me-2" style="max-height:100px; display:none;">
+              <source type="video/mp4">
+            </video>
+            <button class="btn btn-sm btn-outline-danger" onclick="removePreview()">Remove</button>
+          </div>
+        </div>
+
+        <!-- Chat Form -->
+        <form id="chat-form" method="post" enctype="multipart/form-data" class="border-top p-3 bg-white d-flex align-items-center" style="color:black;">
+          {% csrf_token %}
+          <textarea name="content" class="form-control me-2" rows="1" placeholder="Type your message..." style="resize:none;"></textarea>
+
+          <!-- Upload Icon with Dropdown -->
+          <div class="btn-group dropup me-2">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-paperclip"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" onclick="document.getElementById('image-upload').click(); return false;">Upload Image</a></li>
+              <li><a class="dropdown-item" href="#" onclick="document.getElementById('video-upload').click(); return false;">Upload Video</a></li>
+            </ul>
+          </div>
+
+          <!-- Hidden File Inputs -->
+          <input type="file" name="image" id="image-upload" class="d-none" accept="image/*">
+          <input type="file" name="video" id="video-upload" class="d-none" accept="video/*">
+
+          <button type="submit" class="btn btn-success">Send</button>
+        </form>
+      {% else %}
+        <div class="d-flex align-items-center justify-content-center flex-grow-1 text-muted">
+          <p>Select a chat from the left panel.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Auto-scroll chat to bottom
+  const chatBox = document.getElementById('chat-box');
+  if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+
+  const previewDiv = document.getElementById('preview');
+  const previewImg = document.getElementById('preview-img');
+  const previewVideo = document.getElementById('preview-video');
+
+  function showPreview(input, type) {
+    const file = input.files[0];
+    if (!file) {
+      previewDiv.style.display = 'none';
+      return;
+    }
+    previewDiv.style.display = 'block';
+    if (type === 'image') {
+      previewImg.style.display = 'block';
+      previewVideo.style.display = 'none';
+      previewImg.src = URL.createObjectURL(file);
+    } else if (type === 'video') {
+      previewVideo.style.display = 'block';
+      previewImg.style.display = 'none';
+      previewVideo.src = URL.createObjectURL(file);
+    }
+  }
+
+  function removePreview() {
+    previewDiv.style.display = 'none';
+    previewImg.src = '';
+    previewVideo.src = '';
+    document.getElementById('image-upload').value = '';
+    document.getElementById('video-upload').value = '';
+  }
+
+  document.getElementById('image-upload').addEventListener('change', function () {
+    showPreview(this, 'image');
+  });
+  document.getElementById('video-upload').addEventListener('change', function () {
+    showPreview(this, 'video');
+  });
+</script>
+{% endblock %}

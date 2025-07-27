@@ -1,0 +1,9 @@
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <div class="mb-3">
+    <label for="images" class="form-label">Upload Images</label>
+    <input type="file" name="images" id="images" class="form-control" multiple>
+  </div>
+  <button type="submit" class="btn btn-primary w-100">Post Vehicle</button>
+</form>

@@ -1,0 +1,98 @@
+{% extends 'listings/base.html' %}
+{% block title %}Sign Up | Motors Mania{% endblock %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+    body {
+        font-family: 'Montserrat', sans-serif;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        margin: 0;
+        padding: 0;
+    }
+
+    .auth-page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+
+    .auth-box {
+        width: 400px;
+        background: #fff;
+        padding: 40px 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .auth-box h2 {
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .auth-box form input {
+        background: #f2f2f2;
+        border: none;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 5px;
+        width: 100%;
+        font-size: 14px;
+    }
+
+    .auth-box button {
+        border: none;
+        padding: 12px 20px;
+        margin-top: 10px;
+        border-radius: 30px;
+        background: #6a11cb;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        width: 100%;
+        transition: background 0.3s ease;
+    }
+
+    .auth-box button:hover {
+        background: #2575fc;
+    }
+
+    .auth-box p {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+
+    .auth-box a {
+        color: #6a11cb;
+        text-decoration: none;
+        font-weight: 600;
+    }
+</style>
+<div class="auth-page">
+  <div class="auth-box">
+    <h2>Sign Up</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        {{ form.username }}
+      </div>
+      <div class="form-group">
+        {{ form.email }}
+      </div>
+      <div class="form-group">
+        {{ form.password1 }}
+      </div>
+      <div class="form-group">
+        {{ form.password2 }}
+      </div>
+      <button type="submit">Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="{% url 'auth' %}">Login</a></p>
+  </div>
+</div>
+{% endblock %}

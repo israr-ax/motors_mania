@@ -1,0 +1,44 @@
+{% extends 'listings/base.html' %}
+{% block title %}Post Your Vehicle | Motors Mania{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="form-box">
+      <h3 class="mb-4 text-center">🚗 Post Your Vehicle</h3>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        <!-- Multiple Image Upload -->
+        <div class="mb-3">
+          <label for="images" class="form-label">Upload Vehicle Images</label>
+          <input type="file" name="images" id="images" class="form-control" multiple>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary w-100 mt-3">Post Vehicle</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('images').addEventListener('change', function(e){
+  let previewContainer = document.getElementById('preview');
+  previewContainer.innerHTML = '';
+  Array.from(e.target.files).forEach(file => {
+    let reader = new FileReader();
+    reader.onload = function(e) {
+      let img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.width = '100px';
+      img.style.margin = '5px';
+      previewContainer.appendChild(img);
+    }
+    reader.readAsDataURL(file);
+  });
+});
+</script>
+<div id="preview" class="mt-3"></div>
+
+{% endblock %}

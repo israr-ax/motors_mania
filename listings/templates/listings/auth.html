@@ -1,0 +1,478 @@
+{% extends 'listings/base.html' %}
+{% block title %}Login & Signup | Motors Mania{% endblock %}
+
+{% block content %}
+     <style>
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+           main.container {
+      border-radius: 12px;
+      padding: 2rem;
+      margin-top: 2rem;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    body{
+        background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+        color: #fff;
+    }
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-box {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+            width: 800px;
+            max-width: 100%;
+            min-height: 520px;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s ease-in-out;
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transition: all 0.6s ease-in-out;
+        }
+
+        .sign-in-container { 
+            left: 0; 
+            z-index: 2; 
+        }
+
+        .sign-up-container { 
+            left: 0; 
+            opacity: 0; 
+            z-index: 1; 
+        }
+
+        .auth-box.right-panel-active .sign-in-container {
+            transform: translateX(100%);
+        }
+
+        .auth-box.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+        }
+
+        form {
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 50px;
+            height: 100%;
+            justify-content: center;
+            text-align: center;
+        }
+
+        form h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        form input {
+            background-color: #eee;
+            border: none;
+            padding: 12px 15px;
+            margin: 8px 0;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+    button {
+        border-radius: 20px;
+        border: 1px solid #ff0055;
+        background: #ff0055;
+        color: #fff;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 12px 45px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-top: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px #ff0055;
+    }
+
+        button:hover {
+        background: #ff3366;
+        box-shadow: 0 0 20px #ff0055, 0 0 40px #ff0055;
+        transform: scale(1.05);
+    }
+
+        .toggle-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out;
+            z-index: 100;
+        }
+
+        .auth-box.right-panel-active .toggle-container {
+            transform: translateX(-100%);
+        }
+
+        .toggle {
+            background: linear-gradient(to right, #ff0055, #ff3366);
+            color: #fff;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .auth-box.right-panel-active .toggle {
+            transform: translateX(50%);
+        }
+
+        .password-container {
+            position: relative;
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .password-container input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border-radius: 5px;
+            border: none;
+            background: #eee;
+            font-size: 14px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            transform: translateY(-50%) scale(1.2);
+            color: #ff0055;
+        }
+
+        .toggle-password i {
+            font-size: 16px;
+        }
+
+        .toggle-panel {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 30px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .toggle-left { 
+            transform: translateX(-200%); 
+        }
+
+        .auth-box.right-panel-active .toggle-left { 
+            transform: translateX(0); 
+        }
+
+        .toggle-right { 
+            right: 0; 
+        }
+
+        .auth-box.right-panel-active .toggle-right { 
+            transform: translateX(200%); 
+        }
+
+        .toggle-panel h1 {
+            margin-bottom: 10px;
+        }
+
+        .toggle-panel p {
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        {% comment %} MOBILE RESPONSIVEEE {% endcomment %}
+        @media (max-width: 768px) {
+            .auth-container {
+                padding: 10px;
+            }
+
+            .auth-box {
+                width: 100%;
+                min-height: 500px;
+                flex-direction: column;
+                max-width: 400px;
+            }
+
+            .form-container {
+                width: 100%;
+                height: 50%;
+                left: 0 !important;
+            }
+
+            .sign-in-container {
+                top: 50%;
+                z-index: 2;
+                transform: translateY(0);
+            }
+
+            .sign-up-container {
+                top: 50%;
+                opacity: 0;
+                z-index: 1;
+                transform: translateY(100%);
+            }
+
+            /* Mobile active states - vertical transitions */
+            .auth-box.right-panel-active .sign-in-container {
+                transform: translateY(100%);
+            }
+
+            .auth-box.right-panel-active .sign-up-container {
+                transform: translateY(0);
+                opacity: 1;
+                z-index: 5;
+            }
+
+            .toggle-container {
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 50%;
+                transform: translateY(0);
+            }
+
+            .auth-box.right-panel-active .toggle-container {
+                transform: translateY(0);
+            }
+
+            .toggle {
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 150%;
+                background: linear-gradient(to bottom, #ff3366, #ff0055);
+            }
+
+            .auth-box.right-panel-active .toggle {
+                transform: translateY(-50%);
+            }
+
+            .toggle-panel {
+                width: 100%;
+                height: 50%;
+                padding: 20px;
+            }
+
+            .toggle-left {
+                transform: translateY(200%);
+                top: 50%;
+            }
+
+            .auth-box.right-panel-active .toggle-left {
+                transform: translateY(0);
+            }
+
+            .toggle-right {
+                right: auto;
+                top: 0;
+                transform: translateY(0);
+            }
+
+            .auth-box.right-panel-active .toggle-right {
+                transform: translateY(-200%);
+            }
+
+            form {
+                padding: 20px 30px;
+            }
+
+            form h1 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            .toggle-panel h1 {
+                font-size: 20px;
+            }
+
+            .toggle-panel p {
+                font-size: 14px;
+            }
+
+            button {
+                padding: 10px 35px;
+                font-size: 11px;
+            }
+        }
+
+        /* Smaller mobile devices */
+        @media (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+  }
+  .authBox {
+    width: 100%;
+  }
+} 
+        @media (max-width: 480px) {
+            .auth-box {
+                min-height: 450px;
+                max-width: 350px;
+                margin-bottom: 260px;
+            }
+
+            form {
+                padding: 15px 20px;
+            }
+
+            form h1 {
+                font-size: 22px;
+            }
+
+            .sign-in-container{
+                    top: 37%;
+            }
+            .sign-up-container {
+                padding-bottom: 70px;
+
+            }
+            .toggle-panel {
+                padding: 15px;
+                
+            }
+            .toggle-container{
+                height: 36%;
+            }
+            .toggle-panel h1 {
+                font-size: 18px;
+            }
+
+            .toggle-panel p {
+                font-size: 13px;
+            }
+        }
+    </style>
+
+    <div class="auth-container">
+        <div class="auth-box" id="authBox" style=" height: 100%; ">
+     <!-- Sign Up USERRR -->
+<div class="form-container sign-up-container">
+    <form method="post" action="{% url 'signup' %}">
+        <h1>Create Account</h1>
+        {% csrf_token %}
+        {{ signup_form.username }}
+        {{ signup_form.email }}
+
+        <div class="password-container">
+            {{ signup_form.password1 }}
+            <span class="toggle-password" onclick="togglePassword('id_password1', this)">
+                <i class="fa-solid fa-eye"></i>
+            </span>
+        </div>
+
+        <div class="password-container">
+            {{ signup_form.password2 }}
+            <span class="toggle-password" onclick="togglePassword('id_password2', this)">
+                <i class="fa-solid fa-eye"></i>
+            </span>
+        </div>
+        
+        <button type="submit" name="signup" style="margin-bottom: 42px;">Sign Up</button>
+    </form>
+</div>
+
+<!-- Sign In USERRRRR-->
+<div class="form-container sign-in-container">
+    <form method="post" action="{% url 'login' %}">
+        <h1>Sign In</h1>
+        {% csrf_token %}
+        {{ login_form.username }}
+        <div class="password-container">
+            {{ login_form.password }}
+            <span class="toggle-password" onclick="togglePassword('id_password', this)">
+                <i class="fa-solid fa-eye"></i>
+            </span>
+        </div>
+        <button type="submit" name="login">Login</button>
+    </form>
+</div>
+
+
+            <!-- Toggle Panels (ANIMATION) -->
+            <div class="toggle-container">
+                <div class="toggle">
+                    <div class="toggle-panel toggle-left">
+                        <h1>Welcome Back!</h1>
+                        <p>To keep connected with us, login here</p>
+                        <button type="button" id="login">Sign In</button>
+                    </div>
+                    <div class="toggle-panel toggle-right">
+                        <h1>Hello, Friend!</h1>
+                        <p>Enter your details to create an account</p>
+                        <button type="button" id="register">Sign Up</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const authBox = document.getElementById('authBox');
+        
+        document.getElementById('register').addEventListener('click', () => {
+            authBox.classList.add("right-panel-active");
+        });
+        
+        document.getElementById('login').addEventListener('click', () => {
+            authBox.classList.remove("right-panel-active");
+        });
+        {% comment %} for PASSWORD SHOW  {% endcomment %}
+        function togglePassword(fieldId, el) {
+            const passwordField = document.getElementById(fieldId);
+            const icon = el.querySelector('i');
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends 'listings/base.html' %}
+
+{% block title %}Home | Motors Mania{% endblock %}
+
+{% block content %}
+<style>
+
+    .vehicle-card {
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+    }
+    .vehicle-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    .vehicle-card img {
+        height: 200px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    .vehicle-card:hover img {
+        transform: scale(1.05);
+    }
+
+
+</style>
+
+<h2 class="mb-3">All Vehicle Listings</h2>
+
+<!-- Filter Form -->
+<form method="get" class="row mb-4 g-2">
+  <div class="col-md-4">
+    <select class="form-select" name="category">
+      <option value="all">All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat.name }}" {% if selected_category == cat.name %}selected{% endif %}>
+          {{ cat.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-4">
+    <select class="form-select" name="vehicle_type">
+      <option value="all">All Types</option>
+      <option value="car" {% if selected_type == 'car' %}selected{% endif %}>Car</option>
+      <option value="bike" {% if selected_type == 'bike' %}selected{% endif %}>Bike</option>
+    </select>
+  </div>
+
+  <div class="col-md-4">
+    <select class="form-select" name="sort">
+      <option value="">Sort By (Newest)</option>
+      <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+      <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+    </select>
+  </div>
+
+  <div class="col-md-4">
+    <button type="submit" class="btn btn-primary w-100">Filter</button>
+  </div>
+</form>
+
+<!-- Search Form -->
+<form method="get" class="row mb-4 g-2">
+  <div class="col-md-10">
+    <input 
+      type="text" 
+      name="search" 
+      value="{{ request.GET.search }}" 
+      class="form-control" 
+      placeholder="Search by title or description...">
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-outline-secondary w-100">Search</button>
+  </div>
+</form>
+
+<!-- Vehicle Listings -->
+<div class="row">
+  {% for vehicle in vehicles %}
+    <div class="col-md-4 mb-4">
+      <div class="card vehicle-card h-100 shadow-sm">
+
+        <!-- Vehicle Image -->
+        {% if vehicle.images.first %}
+  <a href="{% url 'vehicle_detail' vehicle.pk %}">
+    <img src="{{ vehicle.images.first.image.url }}" 
+         class="card-img-top vehicle-img" 
+         style="height: 200px; object-fit: cover;" 
+         alt="{{ vehicle.title }}">
+  </a>
+{% else %}
+  <a href="{% url 'vehicle_detail' vehicle.pk %}">
+    <div style="height: 200px; background: #f0f0f0; color: #999; 
+                display: flex; align-items: center; justify-content: center; 
+                font-size: 16px; font-weight: bold;">
+        No Image
+    </div>
+  </a>
+{% endif %}
+
+
+        <div class="card-body">
+          <h5 class="card-title">{{ vehicle.title }}</h5>
+          <p class="card-text"><strong>PKR.</strong> {{ vehicle.price }}</p>
+          <p class="card-text">{{ vehicle.description|truncatechars:112 }}</p>
+
+          <!-- Category and Type -->
+          <span class="badge bg-primary">{{ vehicle.get_category_display }}</span>
+          <span class="badge bg-info text-dark">{{ vehicle.get_vehicle_type_display }}</span>
+
+          <!-- Status Badge -->
+          {% if vehicle.status == "Available" %}
+            <span class="badge bg-success">{{ vehicle.status }}</span>
+          {% else %}
+            <span class="badge bg-danger">{{ vehicle.status }}</span>
+          {% endif %}
+
+          <!-- View Details Button -->
+          <a href="{% url 'vehicle_detail' vehicle.pk %}" class="btn btn-outline-primary btn-sm w-100 mt-2">
+            <i class="bi bi-eye"></i> View Details
+          </a>
+
+          <!-- Save Button -->
+          {% if user.is_authenticated %}
+    <form method="post" action="{% url 'toggle_favorite' vehicle.id %}" class="mt-2">
+        {% csrf_token %}
+        {% if vehicle.is_favorited %}
+            <button type="submit" class="btn btn-sm btn-danger w-100">❤️ Saved</button>
+        {% else %}
+            <button type="submit" class="btn btn-sm btn-outline-danger w-100">🤍 Save</button>
+        {% endif %}
+    </form>
+{% else %}
+    <a href="{% url 'login' %}" class="btn btn-sm btn-outline-secondary w-100 mt-2">Login to Save</a>
+{% endif %}
+
+
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12">
+      <p class="text-center text-muted">No vehicles posted yet.</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
