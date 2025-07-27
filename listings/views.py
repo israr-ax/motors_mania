@@ -104,9 +104,6 @@ class CustomLoginView(LoginView):
     template_name = 'listings/auth.html'
 
 
-
-
-
 from .models import Vehicle, VehicleImage
 from .forms import VehiclePostForm, VehicleImageForm
 
