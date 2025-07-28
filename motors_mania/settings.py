@@ -14,7 +14,6 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-CSRF_TRUSTED_ORIGINS=["https://motorsmania-production-0c79.up.railway.app/auth/?next=/"]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -22,6 +21,7 @@ CSRF_TRUSTED_ORIGINS=["https://motorsmania-production-0c79.up.railway.app/auth/?
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-8y9q#sz*3_-449z$hdfntpdy#*18s&l(qk+vb_!i#t!gw9kqi^'
 
+CSRF_TRUSTED_ORIGINS=["https://motorsmania-production-0c79.up.railway.app/auth/?next=/"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
