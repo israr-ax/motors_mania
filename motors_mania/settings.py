@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-8y9q#sz*3_-449z$hdfntpdy#*18s&l(qk+vb_!i#t!gw9kqi^'
 
-CSRF_TRUSTED_ORIGINS=["https://motorsmania-production-0c79.up.railway.app/auth/?next=/"]
+CSRF_TRUSTED_ORIGINS=['*']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
