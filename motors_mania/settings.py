@@ -23,7 +23,7 @@ SECRET_KEY = 'django-insecure-8y9q#sz*3_-449z$hdfntpdy#*18s&l(qk+vb_!i#t!gw9kqi^
 
 CSRF_TRUSTED_ORIGINS=['https://motorsmania-production-0c79.up.railway.app']
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
