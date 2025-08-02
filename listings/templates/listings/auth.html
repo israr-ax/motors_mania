@@ -390,7 +390,7 @@
         <div class="auth-box" id="authBox" style=" height: 100%; ">
      <!-- Sign Up USERRR -->
 <div class="form-container sign-up-container">
-    <form method="post" action="{% url 'signup' %}">
+    <form method="post" action="{% url 'auth' %}">
         <h1>Create Account</h1>
         {% csrf_token %}
         {{ signup_form.username }}
@@ -416,7 +416,7 @@
 
 <!-- Sign In USERRRRR-->
 <div class="form-container sign-in-container">
-    <form method="post" action="{% url 'login' %}">
+    <form method="post" action="{% url 'auth' %}">
         <h1>Sign In</h1>
         {% csrf_token %}
         {{ login_form.username }}
