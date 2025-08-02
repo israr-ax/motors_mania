@@ -59,7 +59,7 @@
                             <h5 class="card-title">{{ fav.vehicle.title }}</h5>
                             <p class="price-tag">PKR. {{ fav.vehicle.price }}</p>
                             <a href="{% url 'vehicle_detail' fav.vehicle.pk %}" class="btn btn-sm btn-primary w-100 mb-2">View Details</a>
-                            <a href="{% url 'start_chat' fav.vehicle.pk %}" class="btn btn-sm btn-chat w-100">💬 Chat Seller</a>
+                            <a href="{% url 'start_chat' fav.vehicle.seller.id %}" class="btn btn-sm btn-chat w-100">💬 Chat Seller</a>
                         </div>
                     </div>
                 </div>
